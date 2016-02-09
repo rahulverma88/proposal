@@ -1,0 +1,228 @@
+
+\section{ProposedResearch}
+
+\subsection{Two-phase modeling: Validation of methods and mixed wettability}
+
+In the first part of the research, we focus on two-phase flow models for drainage. We implement two different techniques for prediction of critical curvatures in rhomboidal packings: the variational formulation of the level set method, and the OpenFOAM VOF method. Brief descriptions of each method are given later. Subsequently, we use match predictions from the numerical techniques with those from experiments. These experiments are designed to be similar to those conducted by Mason and Morrow (1994). 
+
+\subsubsection{Level set method and modification for contact angles}
+
+The method introduced by Prodanovi\'{c} and Bryant \cite{prodanovic_porous_2006} - called the level set based progressive quasi-static (LSMPQS) method - models displacement  of immiscible fluids with zero contact angles in arbitrarily complex geometries.
+
+The method is based on the main level set evolution equation:
+\begin{equation} 
+		\label{eq:levelset}
+		\partial_t\phi + F|\nabla\phi| = 0
+\end{equation}
+
+The tracked interface is the zero level set of the function $\phi$. The level set function $\phi$ is defined implicitly such that it is positive ``outside'', or on the side on convexity, and negative on the concave side. In simpler terms, the function $\phi$ is defined throughout the domain of interest as the distance from the wetting/non-wetting fluid interface, which is the zero level set. As one advances the interface, the $\phi$ function is updated throughout the domain according to the level set equation. Therefore, in a two-phase porous media formulation, $\phi <0$ could denote the wetting phase, and $\phi>0$ denotes the non-wetting phase and solid grain together (this choice is, of course, arbitrary). For our application, this provides a convenient way of differentiating the wetting and non-wetting fluids, as the wetting fluid is going to be on the convex side of the interface. 
+
+Equation (\ref{eq:levelset}) governs the evolution of the function $\phi$ in space during a period of time. $F$ represents the net normal speed of the interface, and in the original LSMPQS algorithm is based on the difference between the current interfacial capillary pressure and the Young-Laplace equation (details omitted here for brevity). 
+
+In our application, $F$ is a function defined by the difference between imposed normal speed, $a$ (which can also be viewed as a pressure-like term acting normally to the interface), and normal speed due to curvature of the interface, $b\kappa$. $b$ is a constant which determines how strong the effect of curvature is - it is an interfacial tension-like term, and is always positive for stability of the numerical method. The two speeds are opposite in direction, since the corresponding physical forces balance each other. In addition, we define an external advective velocity field for the interface. This has been used later near the solid boundary to impose the contact angle. Only the velocity components normal to the interface affect it, and one can include those inside $F$. Thus, Equation (\ref{eq:levelset}) can be written as:
+
+\begin{equation} 
+		\label{eq:levelset_2}
+		\partial_t\phi + (a-b\kappa)|\nabla\phi|+\vec{V}\cdot\nabla\phi = 0
+\end{equation}
+
+Here, $\vec{V}$ is the external advective velocity field.
+
+Defining the interface implicitly means that changes in the topology of the fluid phases, such as snap-off and merging of fluid menisci, are handled automatically.
+
+The pore-grain boundary is defined by a separate level set function $\psi$, such that the boundary is where $\psi=0$, and in this application $\psi$ does not change. In the original formulation, imposing $\phi(x,t)\leq\psi$ prevented fluid-fluid interface from entering the solid phase. This results in a zero contact angle, and we modify it to allow overlap of fluid and solid regions near the boundary that allows for formation of contact angle, see below for details. We refer to this process as ``masking''.
+
+Initially, we introduce a meniscus of low initial curvature into the domain, and advance it until it reaches an equilibrium position in the given geometry. The speed at which the meniscus approaches the pore throat must be low enough so that it does not simply advance to the opposite end of the simulation volume without reaching an equilibrium position. This is different from the compressible model used by Prodanovi\'{c} \& Bryant \cite{prodanovic_porous_2006}, but it does not affect the ultimate critical curvature.
+
+Once the meniscus has been introduced in the domain, we advance it using a modified form of the level set equation (Equation (\ref{eq:levelset})) from Jettestuen \emph{et al.} \cite{jettestuen_level_2013}. This is done using the variational approach, and we include the normal, curvature and convective velocity terms so that the level set equation becomes:
+
+
+\begin{equation}
+\label{eq:variationallevelset}
+\phi_t + \{H(-\psi)\kappa_0 - S(\psi)H(\psi)Ccos\beta|\nabla\psi|\}|\nabla\phi| \\
++S(\psi)H(\psi)C\nabla\psi\cdot\nabla\phi = H(-\psi)\kappa_{\phi}|\nabla\phi|
+\end{equation}
+
+Here, $H()$ denotes a Heaviside function, and is given by:
+
+\begin{equation}
+H(\psi) = \left\{
+	\begin{array}{lr}
+		0,  &  \psi < 0 \\
+		\frac{1}{2} + \frac{\psi}{2\epsilon} + \frac{1}{2\pi}sin\left(\frac{\pi\psi}{\epsilon}\right), & -\epsilon \le \psi \le \epsilon \\
+		1, & \psi> \epsilon
+		\end{array}
+		\right.
+		\label{eq:heaviside}
+\end{equation}
+
+where $\epsilon$ is set to $1.5\Delta x$, and $\Delta x$ is the numerical cell length. It may be noted that $\psi$ in our case is opposite in sign from that used by Jettestuen \emph{et al.} In our application, we multiply $H(-\psi)$ with those velocity terms that are meant to take effect in pore space, whereas the solid phase terms are multiplied by $H(\psi)$. $\theta = \pi - \beta$ is the contact angle imposed on the medium (see Figure \ref{level_set_contactangle}), using the direction of the normals $\vec{n}_\phi$ and $\vec{n}_\psi$. Thus, the modified level set equation works by imposing a velocity near the contact line such that the direction of the velocity vector and the gradient vector of the mask make the desired contact angle. Away from the boundary, we impose only Young-Laplace equation. The diffusive term associated with the zero level set curvature $\kappa_\phi$ in Equation (\ref{eq:variationallevelset}) smooths the level set function so that we get one single smooth interface despite having different speeds of propagation of the interface near and far from the boundary. The curvature $\kappa_\phi$ is given by:
+
+\begin{equation}
+\kappa_\phi = \nabla\cdot\frac{\nabla\phi}{|\nabla\phi|}
+\end{equation}  
+
+For 3D, this becomes:
+
+\begin{equation}
+\kappa_\phi = \frac{( \phi_x^2\phi_{yy} - 2 \phi_x\phi_y\phi_{xy} + \phi_y^2\phi_{xx}+ \phi_x^2\phi_{zz} - 2 \phi_x\phi_z\phi_{xz} + \phi_z^2\phi_{xx}+ \phi_y^2\phi_{zz} - 2 \phi_x\phi_y\phi_{xy})}{|\nabla\phi|^3}
+\label{eq:curvature}
+\end{equation}
+
+$\kappa_0$ is the imposed normal speed on the interface in the pore space. This is slightly different from the quantity $a$ in the original level set equation, as $a$ includes terms both in the pore space and near the boundary. S() is the sign function which ensures that the contact angle propagates away from the walls, and hence ensures numerical stability.
+
+\begin{equation}
+S(\phi) = \frac{\phi}{\sqrt{\phi^2+|\nabla\phi|^2(\Delta x)^2}}
+\end{equation}
+
+C is a constant that was used in Jettestuen \emph{et al.} \cite{jettestuen_level_2013} to scale the contact angle and curvature parts of the velocity. By trial and error, we found it enough to set it equal to one. The level set equation must also be periodically reinitialized to make sure that the gradients in $\phi$ do not become too large. The default reinitialization equation was used, and is given by:
+\begin{equation}
+\phi_t + S(\phi)(|\nabla\phi|-1) = 0
+\end{equation}
+
+By imposing different values of the contact angle at different locations, mixed wettability conditions can be simulated. This has been implemented in Jettestuen \emph{et al.} \cite{jettestuen_level_2013}, but we do not use it here. 
+
+To simulate a drainage process, at every step, the curvature is increased by $\Delta\kappa$ until the steady state solution is found. Therefore, the ``time'' $t$ defined in Equation (\ref{eq:levelset}) is a parameter without physical meaning.
+
+Masking is enforced at every time step with some overlap, so that, $\phi(x,t)+p\leq\psi$, where p is the overlap, measured in the grid spacing $\Delta x$. This is a key difference in our methodology versus that introduced in Jettestuen \emph{et al.} \cite{jettestuen_level_2013}. They also have an overlap in the main equation, but it is not enforced during the masking process. The overlap was found necessary for accuracy as the contact angle became larger. When the contact angle is closer to $0\deg$, no overlap was necessary. As the contact angle increased, the overlap between the pore space and the grain space was increased gradually, up to a maximum overlap of one grid cell. For $40\deg$, the overlap was 0.3 grid cells, then for contact angle $50\deg$ it was 0.5, and finally the overlap was increased to one grid cell by contact angle $60\deg$, and held constant for greater angles. It may be noted the method is stable without this overlap, but we introduced this as it gave a much better match to analytical values. Having an overlap is not physical. However, it allows for formation of contact angles between different interfaces (the cusp is not a possible solution to a level set equation that contains a diffusive curvature term) and does not affect the equilibrium solution as long as overlap regions belonging to two portions of grain boundary do not touch. It is intuitive that the contact angle size is related to the size of the overlap.
+
+An imbibition simulation would proceed by taking the endpoint of a drainage simulation as the starting point. Curvature is decreased step by step, just as it was increased for the previous case. In this work, we have not performed any imbibition simulations.
+
+The equation was solved using the MATLAB level set toolbox written by Ian Mitchell \cite{mitchell2004toolbox,mitchell2008flexible}. The time derivative is approximated with a total variation diminishing Runge-Kutta integration scheme with an order of accuracy between one and three. The Courant-Friedrichs-Lewy (CFL) conditions restrict the size of the timestep. For the convective term, the gradient is approximated by an upwind finite difference scheme with order of accuracy between one and five. One can get fifth order accuracy if you use the WENO (weighted essentially non-oscillatory) scheme, but fifth order accuracy is achieved only near the zero level set. In our simulations, using the third-order accurate ENO (essentially non-oscillatory) scheme gives satisfactory results. For the curvature velocity term, the mean curvature $\kappa$ is approximated using a centered second order accurate finite difference approximation. This is also used in post-processing the results when we want to compute the distribution of curvature values on the interface. Finally, as explained earlier, the level set equation is reinitialized every few time steps using the reinitialization equation in order to maintain $|\nabla\phi| = 1$. This is solved using a Godunov scheme.  Further details of individual numerical schemes can be found in the book by Osher and Fedkiw \cite{osher_level_2003}. In all of our simulations, we use the ``high'' accuracy option in the toolbox, which results in third order temporal accuracy, and use of the third order accurate ENO scheme. 
+
+
+\subsubsection{OpenFOAM VOF methods}
+
+The volume of fluid method is a numerical technique used in the open source software OpenFOAM to track interfaces in multiphase flows. In this implementation the location and velocity of the fluid/fluid interface is updated by using the Navier-Stokes equations, in a coupled manner. The motion of a single incompressible fluid can be described completely by the Navier-Stokes equation along with conservation of mass. For incompressible fluids, conservation of mass is given by:
+
+\begin{equation}
+\nabla \cdot (\vec{u}\rho) = 0
+\label{eq:mass_conservation}
+\end{equation}
+
+The Navier-Stokes equation on the other hand describes conservation of momentum:
+
+\begin{equation}
+\frac{\partial\rho\vec{u}}{\partial t}+\nabla\cdot(\rho\vec{u}\vec{u}) = -\nabla\cdot p + \nabla\cdot(2\mu\vec{E})+\vec{f}_b
+\label{eq:navier_stokes}
+\end{equation}
+
+Here, $\rho$, $\vec{u}$ and $\mu$ describe the density, velocity field and viscosity of the fluid, respectively. $\vec{E}$ is the rate of strain tensor, while $p$ is the pressure field. $\vec{f}_b$ is the external body force term, which can include gravity. So, if one has two immiscible, incompressible fluids, the Navier-Stokes equation along with mass conservation are to be solved for each fluid separately. One would need to solve the appropriate fluid equation depending on which part of the domain we are in.
+
+At the interface between the fluids, we would need to impose continuity of velocity and tangential stresses and maintain jump in the normal stress (equivalent to the capillary pressure). This can be done by considering the velocity to be continuous across the interface, $\Gamma$:
+
+\begin{equation}
+\vec{u}_{\Gamma^-} = \vec{u}_{\Gamma^+}
+\end{equation}
+
+The stress field must satisfy:
+
+\begin{equation}
+[-p\vec{I}+2\mu\vec{E}]_{\Gamma}\cdot \vec{n} = \sigma\kappa\vec{n}
+\end{equation}
+
+$\sigma$ is the wetting/non-wetting fluid surface tension and $\vec{n}$ is the normal to the interface. The curvature, $\kappa$ is twice the mean curvature of the interface and is nominally the same as the one used in the level set method.
+
+The above system of equations can be used to solve for the pressure and velocity fields for each of the two fluids. The condition set on the velocity and stress fields at the interface can be used to advect the interface. However, in a numerical implementation this would lead to solving for moving boundary conditions which is very complex and time-consuming, especially as we are dealing with two separate fluid domains \cite{ferrari2014inertial}. To get around this problem, the VOF method was introduced by Hirt and Nichols in 1981 \cite{hirt1981volume}. Essentially, instead of solving two sets of Navier-Stokes equations and keeping track of the fluid domain and shapes, we define an indicator function which contains the information of which fluid is contained in a given fluid cell.
+
+If one considers a domain having two phases, wetting($P_{w}$) and non-wetting($P_{nw}$), then we can define an indicator function $I(\vec{x},t)$,
+
+\[
+I(\vec{x},t) = \left\{
+	\begin{array}{lr}
+		1,  &  \vec{x} \in  P_{w} \\
+		0, & \vec{x} \in  P_{nw}
+		\end{array}
+		\right.	%\numberthis
+		\label{eq:indicator}
+		\]
+
+So, for cells which are completely wetting phase, the liquid fraction is 1, while for non-wetting it is 0. The interface is located at $I = 1/2$, and is indicated by the Dirac delta function around the interface, $\delta_{\Gamma} = \delta(I-1/2)$. We can then get a modified form of the Navier-Stokes equation in the entire domain:
+
+\begin{equation}
+\frac{\partial\rho\vec{u}}{\partial t}+\nabla\cdot(\rho\vec{u}\vec{u}) = -\nabla\cdot p + \nabla\cdot(2\mu\vec{E})+\vec{f}_b+\vec{f}_s
+\label{eq:vof_navier_stokes}
+\end{equation}
+
+where we can write for the density and viscosity fields:
+
+\begin{align*}
+	\rho(\vec{x},t) & = \rho_w I(\vec{x},t) + \rho_{nw}(1-I(\vec{x},t))\\
+	\mu(\vec{x},t) & = \mu_w I(\vec{x},t) + \mu_{nw} (1-I(\vec{x},t))
+	%\end{aligned}
+%\label{eq:vof_den_vis}
+\end{align*}
+
+The additional term introduced, $\vec{f}_s$ describes the Laplace pressure acting at the surface of discontinuity and is given by:
+\begin{equation}
+\vec{f}_s = \sigma\kappa\vec{n}\delta_{\Gamma}
+\end{equation}
+
+For numerical implementation, the term $\vec{f}_s$ is replaced by a continuum surface force (CSF):
+\begin{equation}
+\vec{f}_v = \sigma\kappa\nabla I
+\end{equation}
+
+$\vec{f}_v$ tends to $\vec{f}_s$ as the thickness of the interface region tends to zero. 
+The curvature $\kappa$ is calculated from the indicator function. This can't be done directly as it leads to large spatial oscillations. Recursive smoothing is employed to get a sufficiently smooth indicator function, $\hat{I}$. The curvature can then be calculated from the smoothed function using:
+
+\begin{equation}
+\kappa = \nabla\cdot\vec{n} = \nabla\cdot\left(\frac{\nabla\hat{I}}{|\nabla\hat{I}|}\right) 
+\end{equation}
+
+It can be seen this is the same as the curvature in the level set method, where the indicator function replaces $\phi$ in Equation (\ref{eq:curvature}).
+Using mass conservation in combination with the modified Navier-Stokes equation (\ref{eq:vof_navier_stokes}), we finally get a simple advection equation for the indicator function:
+
+
+\begin{equation}
+\frac{\partial I}{\partial t} + \nabla \cdot (I\vec{u}) = 0
+\label{eq:vof_advection}
+\end{equation}
+
+This equation is solved explicitly using the velocity from the previous time step. To counterbalance numerical diffusion, a non-linear convective term is added to the equation, which acts as a shock that balances numerical diffusion.
+
+\begin{equation}
+\frac{\partial I}{\partial t} + \nabla \cdot (I\vec{u}) + \nabla \cdot (I(1-I)\vec{u_r}) = 0
+\label{eq:vof_advection_modified}
+\end{equation}
+
+where $\vec{u}_r$ is a compression velocity. Its choice does not affect the solution outside the interfacial region. Note that the indicator function defines the interface implicitly as the 1/2 level set of I, and the advection equation for the indicator function is related to the level set equation (Equation (\ref{eq:levelset})). An example smoothed indicator function is the Heaviside function, defined in Equation (\ref{eq:heaviside}).
+
+At the solid boundaries, the fluids are constrained in the pore space by requiring that the velocity component normal to the solid wall is zero. At the triple-contact line, Young's law determines the contact angle:
+
+\begin{equation}
+cos \theta = \frac{\sigma_{nw,s}-\sigma_{w,s}}{\sigma}
+\end{equation}
+
+where $\sigma_{nw,s}$ is the non-wetting fluid/solid interfacial tension, $\sigma_{w,s}$ is the wetting fluid/solid interfacial tension.
+
+For imposing the contact angle in our simulation, this is equivalent to imposing the boundary condition:
+
+\begin{equation}
+\vec{n}_{\Gamma_s} = \vec{n}_s cos \theta + \vec{t}_s sin \theta
+\end{equation}
+
+where $\vec{t}_s$ is the unit tangential vector pointing into the wetting phase. 
+
+OpenFOAM uses finite volume discretization for the above equations for mass and momentum conservation, and advection of the indicator function. The advection equation (Equation (\ref{eq:vof_advection_modified})) is used to update the indicator function values throughout the domain. This is then used to update fluid properties throughout the domain, and calculate the CSF force. Finally, the solution of the momentum equation (Equation (\ref{eq:vof_navier_stokes})) is performed by using the Pressure Implicit with Splitting of Operators (PISO) implicit pressure correction procedure. Further details on the implementation of interFoam and the numerical schemes used may be looked up in Deshpande \emph{et al.} \cite{deshpande2012evaluating}.
+
+To speed up the computations and approach capillary equilibrium faster, a damping term  $-K\vec{u}$ has been added to the right-hand side of the momentum equation. The term resembles the Darcy's law with a negative source of momentum given by a constant (e.g. permeability) and the velocity. This stabilizes the interface faster after each increase of pressure and avoids strong oscillations around the equilibrium condition. In this case a unitary viscosity and a very small surface tension have been used, giving rise to negligible parasitic currents. The damping term also helps to kill any arising non-zero velocity. A special version of the solver interFoam, with a local time stepping (LTSInterFoam), has been used to march in pseudo-time without prescribing a pre-defined time step. This technique can maximize the time step (therefore reducing the relaxation time) in each cell. The resulting iterations are therefore not physical and not related to a real evolution in time but simply represent internal iterations to reach the steady state. All these choices make the VOF solver under study equivalent to the quasi-static level set formulation. The remaining differences lay on the different equations solved, on the implementation of curvature and boundary conditions.
+
+
+\subsubsection{Two-phase experiments for mixed wettability}
+
+Mason and Morrow (1994) performed experiments for determining the critical curvatures in a rhomboidal packing of four spheres. In their set up, all the spheres had the same wettability. The advantage of that is that one can obtain arc menisci in the same cross section, and one can then use the MS-P method for prediction of critical curvatures. However, if the wettability of the spheres varies, then the wetting fluid would tend to spread differently on some spheres than others. Thus, the critical curvatures are likely to be very different. This is likely much more representative of a real rock, where one can have grains of different mineralogy or roughness packed in the same pore. 
+
+Here, we describe the setup for the experiment.
+
+\subsubsection{Upscaling: combination with pore network modeling}
+
+The results from the two-phase studies indicate that we have at least two reliable techniques for prediction of curvatures in arbitrary geometries. Thus, we can use these methods to predict the critical curvatures in arbitrary shapes used in pore network modeling.
+
+Many different shapes can be employed for a given pore network model. We propose extracting a set of shapes from the three-dimensional image of the porous medium. Instead of defining which shape to extract beforehand, we could modify the image analysis algorithm to find the best possible set of shapes to predict the properties of the porous medium. Alternatively, we could simply use shapes which better approximate the porous medium walls. One common feature of pore network models is that they all rely on a constant cross section for prediction of critical capillary pressures. This is one constraint we could remove from the method.
+
+Using the updated method for extraction of pore networks, we can use the method on images of cores to test if our hypothesis is correct.
+
+\subsection{Three-phase methods: direct modeling and validation}
+
+

@@ -1,0 +1,163 @@
+\begin{thebibliography}{10}
+
+\bibitem{blunt_flow_2001}
+Martin~J. Blunt.
+\newblock Flow in porous media — pore-network models and multiphase flow.
+\newblock {\em Current Opinion in Colloid \& Interface Science}, 6(3):197--207,
+  June 2001.
+
+\bibitem{blunt_pore-scale_2013}
+Martin~J. Blunt, Branko Bijeljic, Hu~Dong, Oussama Gharbi, Stefan Iglauer,
+  Peyman Mostaghimi, Adriana Paluszny, and Christopher Pentland.
+\newblock Pore-scale imaging and modelling.
+\newblock {\em Advances in Water Resources}, 51:197--216, January 2013.
+
+\bibitem{blunt_detailed_2002}
+Martin~J. Blunt, Matthew~D. Jackson, Mohammad Piri, and Per~H. Valvatne.
+\newblock Detailed physics, predictive capabilities and macroscopic
+  consequences for pore-network models of multiphase flow.
+\newblock {\em Advances in Water Resources}, 25(8–12):1069--1089, August
+  2002.
+
+\bibitem{bryant_prediction_1992}
+Steven Bryant and Martin Blunt.
+\newblock Prediction of relative permeability in simple porous media.
+\newblock {\em Physical Review A}, 46(4):2004--2011, August 1992.
+
+\bibitem{culligan_interfacial_2004}
+Katherine~A. Culligan, Dorthe Wildenschild, Britt S.~B. Christensen, William~G.
+  Gray, Mark~L. Rivers, and Andrew F.~B. Tompson.
+\newblock Interfacial area measurements for unsaturated flow through a porous
+  medium.
+\newblock {\em Water Resources Research}, 40(12):n/a--n/a, 2004.
+
+\bibitem{dehghanpour_flow_2011}
+H.~Dehghanpour, B.~Aminzadeh, M.~Mirzaei, and D.~A. DiCarlo.
+\newblock Flow coupling during three-phase gravity drainage.
+\newblock {\em Physical Review E}, 83(6):065302, June 2011.
+
+\bibitem{dicarlo_three-phase_2000}
+D.A. DiCarlo, Sahni Akshay, and M.J. Blunt.
+\newblock Three-{Phase} {Relative} {Permeability} of {Water}-{Wet},
+  {Oil}-{Wet}, and {Mixed}-{Wet} {Sandpacks}.
+\newblock {\em SPE Journal}, 5(1), March 2000.
+
+\bibitem{esodoglu_variational_2008}
+Selim Esodoglu and Peter Smereka.
+\newblock A variational formulation for a level set representation of
+  multiphase flow and area preserving curvature flow.
+\newblock {\em Communications in Mathematical Sciences}, 6(1):125--148, March
+  2008.
+\newblock Mathematical Reviews number (MathSciNet): MR2398000; Zentralblatt
+  MATH identifier: 1137.76067.
+
+\bibitem{flannery_three-dimensional_1987}
+Brian~P. Flannery, Harry~W. Deckman, Wayne~G. Roberge, and Kevin~L. D'amico.
+\newblock Three-{Dimensional} {X}-ray {Microtomography}.
+\newblock {\em Science}, 237(4821):1439--1444, September 1987.
+
+\bibitem{helba_percolation_1992}
+A.A. Helba, Muhammad Sahimi, L.E. Scriven, and H.T. Davis.
+\newblock Percolation {Theory} of {Two}-{Phase} {Relative} {Permeability}.
+\newblock {\em SPE Reservoir Engineering}, 7(1), February 1992.
+
+\bibitem{herring_effect_2013}
+Anna~L. Herring, Elizabeth~J. Harper, Linnéa Andersson, Adrian Sheppard,
+  Brian~K. Bay, and Dorthe Wildenschild.
+\newblock Effect of fluid topology on residual nonwetting phase trapping:
+  {Implications} for geologic {CO}2 sequestration.
+\newblock {\em Advances in Water Resources}, 62, Part A:47--58, December 2013.
+
+\bibitem{jerauld_effect_1990}
+G.~R. Jerauld and S.~J. Salter.
+\newblock The effect of pore-structure on hysteresis in relative permeability
+  and capillary pressure: {Pore}-level modeling.
+\newblock {\em Transport in Porous Media}, 5(2):103--151, April 1990.
+
+\bibitem{jettestuen_level_2013}
+Espen Jettestuen, Johan~O. Helland, and Maša Prodanović.
+\newblock A level set method for simulating capillary-controlled displacements
+  at the pore scale with nonzero contact angles.
+\newblock {\em Water Resources Research}, 49(8):4645--4661, 2013.
+
+\bibitem{mason_effect_1994}
+Geoffrey Mason and Norman~R. Morrow.
+\newblock Effect of {Contact} {Angle} on {Capillary} {Displacement}
+  {Curvatures} in {Pore} {Throats} {Formed} by {Spheres}.
+\newblock {\em Journal of Colloid and Interface Science}, 168(1):130--141,
+  November 1994.
+
+\bibitem{olsson_conservative_2005}
+Elin Olsson and Gunilla Kreiss.
+\newblock A conservative level set method for two phase flow.
+\newblock {\em Journal of Computational Physics}, 210(1):225--246, November
+  2005.
+
+\bibitem{oren_extending_1998}
+P.-E. Oren, Stig Bakke, and O.J. Arntzen.
+\newblock Extending {Predictive} {Capabilities} to {Network} {Models}.
+\newblock {\em SPE Journal}, 3(4), December 1998.
+
+\bibitem{osher_level_2003}
+Stanley Osher and Ronald Fedkiw.
+\newblock {\em Level {Set} {Methods} and {Dynamic} {Implicit} {Surfaces}}.
+\newblock Springer, 2003.
+
+\bibitem{osher_fronts_1988}
+Stanley Osher and James~A Sethian.
+\newblock Fronts propagating with curvature-dependent speed: {Algorithms} based
+  on {Hamilton}-{Jacobi} formulations.
+\newblock {\em Journal of Computational Physics}, 79(1):12--49, November 1988.
+
+\bibitem{piri_three-phase_2004}
+Mohammad Piri and Martin~J. Blunt.
+\newblock Three-phase threshold capillary pressures in noncircular capillary
+  tubes with different wettabilities including contact angle hysteresis.
+\newblock {\em Physical Review E}, 70(6):061603, December 2004.
+
+\bibitem{piri_three-dimensional_2005}
+Mohammad Piri and Martin~J. Blunt.
+\newblock Three-dimensional mixed-wet random pore-scale network modeling of
+  two- and three-phase flow in porous media. {I}. {Model} description.
+\newblock {\em Physical Review E}, 71(2):026301, February 2005.
+
+\bibitem{prodanovic_porous_2006}
+M.~Prodanović, W.B. Lindquist, and R.S. Seright.
+\newblock Porous structure and fluid partitioning in polyethylene cores from 3d
+  {X}-ray microtomographic imaging.
+\newblock {\em Journal of Colloid and Interface Science}, 298(1):282--297, June
+  2006.
+
+\bibitem{sethian_level_1999}
+J.~A. Sethian.
+\newblock {\em Level {Set} {Methods} and {Fast} {Marching} {Methods}:
+  {Evolving} {Interfaces} in {Computational} {Geometry}, {Fluid} {Mechanics},
+  {Computer} {Vision}, and {Materials} {Science}}.
+\newblock Cambridge University Press, June 1999.
+
+\bibitem{van_dijke_existence_2006}
+M.I.J. van Dijke and K.S. Sorbie.
+\newblock Existence of fluid layers in the corners of a capillary with
+  non-uniform wettability.
+\newblock {\em Journal of Colloid and Interface Science}, 293(2):455--463,
+  January 2006.
+
+\bibitem{wildenschild_quantitative_2005}
+D.~Wildenschild, J.~W. Hopmans, M.~L. Rivers, and A.~J.~R. Kent.
+\newblock Quantitative {Analysis} of {Flow} {Processes} in a {Sand} {Using}
+  {Synchrotron}-{Based} {X}-ray {Microtomography}.
+\newblock {\em Vadose Zone Journal}, 4(1):112--126, February 2005.
+
+\bibitem{zhao_capturing_1998}
+Hong-Kai Zhao, Barry Merriman, Stanley Osher, and Lihe Wang.
+\newblock Capturing the {Behavior} of {Bubbles} and {Drops} {Using} the
+  {Variational} {Level} {Set} {Approach}.
+\newblock {\em Journal of Computational Physics}, 143(2):495--518, July 1998.
+
+\bibitem{oren_fluid_1995}
+P.~E. Øren and W.~V. Pinczewski.
+\newblock Fluid distribution and pore-scale displacement mechanisms in drainage
+  dominated three-phase flow.
+\newblock {\em Transport in Porous Media}, 20(1-2):105--133, August 1995.
+
+\end{thebibliography}
